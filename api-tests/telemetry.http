@@ -1,0 +1,13 @@
+POST http://localhost:8080/api/telemetry
+Content-Type: application/json
+
+{
+  "systemName": "PROPULSION_TEST_01",
+  "timestamp": "2026-09-29T22:30:00",
+  "temperature": 45.6,
+  "pressure": 101.4,
+  "voltage": 25.7,
+  "current": 3.2,
+  "vibration": 0.18,
+  "battery": 84.0
+}
