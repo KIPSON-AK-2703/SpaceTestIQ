@@ -19,9 +19,12 @@ public class DetectionController {
                 anomalyDetectionService;
     }
 
+    // ---------------------------------------------------------
+    // TEMPERATURE DETECTION
+    // ---------------------------------------------------------
+
     @PostMapping("/temperature")
     public ResponseEntity<AnomalyResult> detectTemperature(
-
             @RequestParam(
                     defaultValue = "DEMO_PROPULSION_PROFILE"
             )
@@ -31,6 +34,28 @@ public class DetectionController {
 
         AnomalyResult result =
                 anomalyDetectionService.detectTemperature(
+                        telemetryData,
+                        profileName
+                );
+
+        return ResponseEntity.ok(result);
+    }
+
+    // ---------------------------------------------------------
+    // PRESSURE DETECTION
+    // ---------------------------------------------------------
+
+    @PostMapping("/pressure")
+    public ResponseEntity<AnomalyResult> detectPressure(
+            @RequestParam(
+                    defaultValue = "DEMO_PROPULSION_PROFILE"
+            )
+            String profileName,
+
+            @RequestBody TelemetryData telemetryData) {
+
+        AnomalyResult result =
+                anomalyDetectionService.detectPressure(
                         telemetryData,
                         profileName
                 );

@@ -26,11 +26,14 @@ public class AnomalyDetectionService {
         this.testProfileRepository = testProfileRepository;
     }
 
+    // ---------------------------------------------------------
+    // TEMPERATURE DETECTION
+    // ---------------------------------------------------------
+
     public AnomalyResult detectTemperature(
             TelemetryData telemetryData,
             String profileName) {
 
-        // 1. Find the test profile in MySQL
         TestProfile profile =
                 testProfileRepository
                         .findByProfileName(profileName)
@@ -41,7 +44,6 @@ public class AnomalyDetectionService {
                                 )
                         );
 
-        // 2. Read temperature limits from MySQL
         ThresholdRule temperatureRule =
                 new ThresholdRule(
                         "Temperature",
@@ -49,7 +51,6 @@ public class AnomalyDetectionService {
                         profile.getTemperatureMaximum()
                 );
 
-        // 3. Run anomaly detection
         AnomalyResult result =
                 thresholdDetector.detect(
                         telemetryData.getSystemName(),
@@ -58,46 +59,66 @@ public class AnomalyDetectionService {
                         temperatureRule
                 );
 
-        // 4. Convert result to database entity
-        AnomalyRecord record =
-                new AnomalyRecord();
+        saveAnomaly(result);
 
-        record.setSystemName(
-                result.getSystemName()
-        );
-
-        record.setParameterName(
-                result.getParameterName()
-        );
-
-        record.setMeasuredValue(
-                result.getMeasuredValue()
-        );
-
-        record.setDetectionMethod(
-                result.getDetectionMethod()
-        );
-
-        record.setAnomalyDetected(
-                result.isAnomalyDetected()
-        );
-
-        record.setSeverity(
-                result.getSeverity()
-        );
-
-        record.setMessage(
-                result.getMessage()
-        );
-
-        record.setDetectedAt(
-                result.getDetectedAt()
-        );
-
-        // 5. Save result to MySQL
-        anomalyRepository.save(record);
-
-        // 6. Return result
         return result;
+    }
+
+    // ---------------------------------------------------------
+    // PRESSURE DETECTION
+    // ---------------------------------------------------------
+
+    public AnomalyResult detectPressure(
+            TelemetryData telemetryData,
+            String profileName) {
+
+        TestProfile profile =
+                testProfileRepository
+                        .findByProfileName(profileName)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "Test profile not found: "
+                                                + profileName
+                                )
+                        );
+
+        ThresholdRule pressureRule =
+                new ThresholdRule(
+                        "Pressure",
+                        profile.getPressureMinimum(),
+                        profile.getPressureMaximum()
+                );
+
+        AnomalyResult result =
+                thresholdDetector.detect(
+                        telemetryData.getSystemName(),
+                        "Pressure",
+                        telemetryData.getPressure(),
+                        pressureRule
+                );
+
+        saveAnomaly(result);
+
+        return result;
+    }
+
+    // ---------------------------------------------------------
+    // SAVE ANOMALY RESULT
+    // ---------------------------------------------------------
+
+    private void saveAnomaly(AnomalyResult result) {
+
+        AnomalyRecord record = new AnomalyRecord();
+
+        record.setSystemName(result.getSystemName());
+        record.setParameterName(result.getParameterName());
+        record.setMeasuredValue(result.getMeasuredValue());
+        record.setDetectionMethod(result.getDetectionMethod());
+        record.setAnomalyDetected(result.isAnomalyDetected());
+        record.setSeverity(result.getSeverity());
+        record.setMessage(result.getMessage());
+        record.setDetectedAt(result.getDetectedAt());
+
+        anomalyRepository.save(record);
     }
 }
