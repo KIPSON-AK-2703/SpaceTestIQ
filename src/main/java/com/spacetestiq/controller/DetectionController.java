@@ -62,4 +62,26 @@ public class DetectionController {
 
         return ResponseEntity.ok(result);
     }
+
+    // ---------------------------------------------------------
+    // VOLTAGE DETECTION
+    // ---------------------------------------------------------
+
+    @PostMapping("/voltage")
+    public ResponseEntity<AnomalyResult> detectVoltage(
+            @RequestParam(
+                    defaultValue = "DEMO_PROPULSION_PROFILE"
+            )
+            String profileName,
+
+            @RequestBody TelemetryData telemetryData) {
+
+        AnomalyResult result =
+                anomalyDetectionService.detectVoltage(
+                        telemetryData,
+                        profileName
+                );
+
+        return ResponseEntity.ok(result);
+    }
 }

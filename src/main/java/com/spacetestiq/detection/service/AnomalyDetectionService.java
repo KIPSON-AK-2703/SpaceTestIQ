@@ -34,15 +34,7 @@ public class AnomalyDetectionService {
             TelemetryData telemetryData,
             String profileName) {
 
-        TestProfile profile =
-                testProfileRepository
-                        .findByProfileName(profileName)
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Test profile not found: "
-                                                + profileName
-                                )
-                        );
+        TestProfile profile = getProfile(profileName);
 
         ThresholdRule temperatureRule =
                 new ThresholdRule(
@@ -72,15 +64,7 @@ public class AnomalyDetectionService {
             TelemetryData telemetryData,
             String profileName) {
 
-        TestProfile profile =
-                testProfileRepository
-                        .findByProfileName(profileName)
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Test profile not found: "
-                                                + profileName
-                                )
-                        );
+        TestProfile profile = getProfile(profileName);
 
         ThresholdRule pressureRule =
                 new ThresholdRule(
@@ -100,6 +84,52 @@ public class AnomalyDetectionService {
         saveAnomaly(result);
 
         return result;
+    }
+
+    // ---------------------------------------------------------
+    // VOLTAGE DETECTION
+    // ---------------------------------------------------------
+
+    public AnomalyResult detectVoltage(
+            TelemetryData telemetryData,
+            String profileName) {
+
+        TestProfile profile = getProfile(profileName);
+
+        ThresholdRule voltageRule =
+                new ThresholdRule(
+                        "Voltage",
+                        profile.getVoltageMinimum(),
+                        profile.getVoltageMaximum()
+                );
+
+        AnomalyResult result =
+                thresholdDetector.detect(
+                        telemetryData.getSystemName(),
+                        "Voltage",
+                        telemetryData.getVoltage(),
+                        voltageRule
+                );
+
+        saveAnomaly(result);
+
+        return result;
+    }
+
+    // ---------------------------------------------------------
+    // GET TEST PROFILE
+    // ---------------------------------------------------------
+
+    private TestProfile getProfile(String profileName) {
+
+        return testProfileRepository
+                .findByProfileName(profileName)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Test profile not found: "
+                                        + profileName
+                        )
+                );
     }
 
     // ---------------------------------------------------------

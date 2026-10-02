@@ -30,25 +30,39 @@ public class TestProfile {
     @Column(nullable = false)
     private double pressureMaximum;
 
+    // Voltage limits
+    @Column(nullable = false)
+    private double voltageMinimum;
+
+    @Column(nullable = false)
+    private double voltageMaximum;
+
     // Default constructor required by JPA
     public TestProfile() {
     }
 
-    // Constructor
+    // Full constructor
     public TestProfile(
             String profileName,
             String description,
             double temperatureMinimum,
             double temperatureMaximum,
             double pressureMinimum,
-            double pressureMaximum) {
+            double pressureMaximum,
+            double voltageMinimum,
+            double voltageMaximum) {
 
         this.profileName = profileName;
         this.description = description;
+
         this.temperatureMinimum = temperatureMinimum;
         this.temperatureMaximum = temperatureMaximum;
+
         this.pressureMinimum = pressureMinimum;
         this.pressureMaximum = pressureMaximum;
+
+        this.voltageMinimum = voltageMinimum;
+        this.voltageMaximum = voltageMaximum;
     }
 
     // ID
@@ -108,5 +122,23 @@ public class TestProfile {
 
     public void setPressureMaximum(double pressureMaximum) {
         this.pressureMaximum = pressureMaximum;
+    }
+
+    // Voltage minimum
+    public double getVoltageMinimum() {
+        return voltageMinimum;
+    }
+
+    public void setVoltageMinimum(double voltageMinimum) {
+        this.voltageMinimum = voltageMinimum;
+    }
+
+    // Voltage maximum
+    public double getVoltageMaximum() {
+        return voltageMaximum;
+    }
+
+    public void setVoltageMaximum(double voltageMaximum) {
+        this.voltageMaximum = voltageMaximum;
     }
 }
